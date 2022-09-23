@@ -50,7 +50,7 @@ class GameState():
     All moves without considering checks
     '''
     def getAllPossibleMoves(self):
-        moves = []
+        moves = [Move((6, 4), (4, 4), self.board)]
         for r in range(len(self.board)): #num of rows
             for c in range(len(self.board[r])): #num of columns in given row
                 turn = self.board[r][c][0] #first character on square (b, w or) - represents color or empty field
@@ -68,6 +68,7 @@ class GameState():
                         self.getQueenMoves(r, c, moves)
                     if piece == 'K':
                         self.getKingMoves(r, c, moves)
+        return moves
 
     '''
     Get all the piece moves for the piece located at row, col and add these moves to the list
@@ -103,6 +104,16 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol #for eq check
+        print(self.moveID)
+
+    """
+    Overriding the equals method
+    """
+    def __eq__(self, other): #compares object with other object
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
 
 
     def getChessNotation(self):

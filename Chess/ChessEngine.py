@@ -10,10 +10,10 @@ class GameState():
         self.board = [
             ["bR","bN", "bB", "bQ", "bK", "bB", "bN", "bR" ],
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "wR", "--", "--", "bB", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "wR", "--", "--", "--"],
+            ["--", "--", "--", "--", "bp", "wR", "--", "--"],
+            ["--", "--", "wR", "--", "bp", "bB", "--", "--"],
+            ["--", "--", "bp", "--", "bp", "--", "--", "--"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR","wN", "wB", "wQ", "wK", "wB", "wN", "wR" ]]
         
@@ -92,30 +92,239 @@ class GameState():
                 if self.board[r+1][c+1][0] == "w": # enemy piece to capture
                     moves.append(Move((r, c),(r+1, c+1),self.board))
                 
-
-    def getRookMoves(self, r, c, moves): #moves only up and down. right and left, so first to check if there is a blank space    
-        for i in range(1,8): 
-            if (r+i) <= 7:
-                if self.board[r+i][c] == "--":
-                    moves.append(Move((r, c), (r+i, c), self.board))
-            if (r-i) >= 0:
-                if self.board[r-i][c] == "--":
-                    moves.append(Move((r, c), (r-i, c), self.board))
-            if (c+i) <= 7:
-                if self.board[r][c+i] == "--":
-                    moves.append(Move((r, c), (r, c+i), self.board))
-            if (c-i) >= 0:    
-                if self.board[r][c-i] == "--":
-                    moves.append(Move((r, c), (r, c-i), self.board))
-        
+# keeps ignoring pieces inbetween
+    def getRookMoves(self, r, c, moves): #moves only up and down. right and left, so first to check if there is a blank space or black piece   
+        if self.whiteToMove: 
+            for i in range(1,7):
+                if (r+i) <= 7:
+                    if self.board[r+i][c] == "--":
+                        k = (r+i)
+                        moves.append(Move((r, c), (k, c), self.board)) 
+                        k += 1
+                        if (k) <= 7:
+                            if self.board[k][c][0] == "b":
+                                moves.append(Move((r, c), (k, c), self.board))
+                    elif self.board[r+1][c][0] == "b":
+                        moves.append(Move((r, c), (r+1, c), self.board))
+                    else:
+                        break
+                
+                if (r-i) >= 0:
+                    if self.board[r-i][c] == "--":
+                        k = (r-i)
+                        moves.append(Move((r, c), (k, c), self.board))
+                        k -= 1
+                        if k >= 0:
+                            if self.board[k][c][0] == "b":
+                                moves.append(Move((r, c), (k, c), self.board))
+                    elif self.board[r-1][c][0] == "b":
+                        moves.append(Move((r, c), (r-1, c), self.board))
+                    else:
+                        break
+                
+                if (c+i) <= 7:
+                    if self.board[r][c+i] == "--":
+                        k = (c+i)
+                        moves.append(Move((r, c), (r, k), self.board))
+                        k += 1
+                        if (k) <= 7:
+                            if self.board[r][k][0] == "b":
+                                moves.append(Move((r, c), (r, k), self.board))
+                    elif self.board[r][c+1][0] == "b":
+                        moves.append(Move((r, c), (r, c+1), self.board))
+                    else:
+                        break
+                
+                if (c-i) >= 0:
+                    if self.board[r-i][c] == "--":
+                        k = c-i
+                        moves.append(Move((r, c), (r, k), self.board))
+                        k -= 1
+                        if k >= 0:
+                            if self.board[r][k][0] == "b":
+                                moves.append(Move((r, c), (r, k), self.board))
+                    elif self.board[r][c-1][0] == "b":
+                        moves.append(Move((r, c), (r, c-1), self.board))
+                    else:
+                        break
+    #             if (c+i) <= 7:
+    #                 if self.board[r][c+i] == "--":
+    #                     moves.append(Move((r, c), (r, c+i), self.board))
+    #                 if self.board[r][c+i][0] == "b":
+    #                     moves.append(Move((r, c), (r, c+i), self.board))
+    #             if (c-i) >= 0:    
+    #                 if self.board[r][c-i] == "--":
+    #                     moves.append(Move((r, c), (r, c-i), self.board))
+    #                 if self.board[r][c-i][0] == "b":
+    #                     moves.append(Move((r, c), (r, c-i), self.board))
+    #         else: #black rook move
+    #             if (r+i) <= 7:
+    #                 if self.board[r+i][c] == "--":
+    #                     moves.append(Move((r, c), (r+i, c), self.board))
+    #                 if self.board[r+i][c][0] == "w":
+    #                     moves.append(Move((r, c), (r+i, c), self.board))          
+    #             if (r-i) >= 0:
+    #                 if self.board[r-i][c] == "--":
+    #                     moves.append(Move((r, c), (r-i, c), self.board))
+    #                 if self.board[r-i][c][0] == "w":
+    #                     moves.append(Move((r, c), (r-i, c), self.board))
+    #             if (c+i) <= 7:
+    #                 if self.board[r][c+i] == "--":
+    #                     moves.append(Move((r, c), (r, c+i), self.board))
+    #                 if self.board[r][c+i][0] == "w":
+    #                     moves.append(Move((r, c), (r, c+i), self.board))
+    #             if (c-i) >= 0:    
+    #                 if self.board[r][c-i] == "--":
+    #                     moves.append(Move((r, c), (r, c-i), self.board))
+    #                 if self.board[r][c-i][0] == "w":
+    #                     moves.append(Move((r, c), (r, c-i), self.board))
 
 
     def getKnightMoves(self, r, c, moves):
         pass
+    
+    
+    
     def getBishopMoves(self, r, c, moves):
         pass
+    #     for i in range(1,7): 
+    #         if self.whiteToMove: # white bishop move 
+    #             if (r+i) <= 7 and (c+i) <= 7:
+    #                 if self.board[r+i][c+i] == "--":
+    #                     moves.append(Move((r, c), (r+i, c+i), self.board))
+    #                 if self.board[r+i][c+i][0] == "b":
+    #                     moves.append(Move((r, c), (r+i, c+i), self.board))          
+    #             if (r-i) >= 0 and (c-i) >= 0:
+    #                 if self.board[r-i][c-i] == "--":
+    #                     moves.append(Move((r, c), (r-i, c-i), self.board))
+    #                 if self.board[r-i][c-i][0] == "b":
+    #                     moves.append(Move((r, c), (r-i, c-i), self.board))
+    #             if (r+i) <= 7 and (c-i) >= 0:
+    #                 if self.board[r+i][c-i] == "--":
+    #                     moves.append(Move((r, c), (r+i, c-i), self.board))
+    #                 if self.board[r+i][c-i][0] == "b":
+    #                     moves.append(Move((r, c), (r+i, c-i), self.board))          
+    #             if (r-i) >= 0 and (c+i) <= 7:
+    #                 if self.board[r-i][c+i] == "--":
+    #                     moves.append(Move((r, c), (r-i, c+i), self.board))
+    #                 if self.board[r-i][c+i][0] == "b":
+    #                     moves.append(Move((r, c), (r-i, c+i), self.board))
+
+    #         else: #black bishop move
+    #             if (r+i) <= 7 and (c+i) <= 7:
+    #                 if self.board[r+i][c+i] == "--":
+    #                     moves.append(Move((r, c), (r+i, c+i), self.board))
+    #                 if self.board[r+i][c+i][0] == "w":
+    #                     moves.append(Move((r, c), (r+i, c+i), self.board))          
+    #             if (r-i) >= 0 and (c-i) >= 0:
+    #                 if self.board[r-i][c-i] == "--":
+    #                     moves.append(Move((r, c), (r-i, c-i), self.board))
+    #                 if self.board[r-i][c-i][0] == "w":
+    #                     moves.append(Move((r, c), (r-i, c-i), self.board))
+    #             if (r+i) <= 7 and (c-i) >= 0:
+    #                 if self.board[r+i][c-i] == "--":
+    #                     moves.append(Move((r, c), (r+i, c-i), self.board))
+    #                 if self.board[r+i][c-i][0] == "w":
+    #                     moves.append(Move((r, c), (r+i, c-i), self.board))          
+    #             if (r-i) >= 0 and (c+i) <= 7:
+    #                 if self.board[r-i][c+i] == "--":
+    #                     moves.append(Move((r, c), (r-i, c+i), self.board))
+    #                 if self.board[r-i][c+i][0] == "w":
+    #                     moves.append(Move((r, c), (r-i, c+i), self.board)) 
+    
     def getQueenMoves(self, r, c, moves):
         pass
+        # for i in range(1,7): 
+        #     if self.whiteToMove: # white queen move 
+        #         if (r+i) <= 7:
+        #             if self.board[r+i][c] == "--":
+        #                 moves.append(Move((r, c), (r+i, c), self.board))
+        #             if self.board[r+i][c][0] == "b":
+        #                 moves.append(Move((r, c), (r+i, c), self.board))          
+        #         if (r-i) >= 0:
+        #             if self.board[r-i][c] == "--":
+        #                 moves.append(Move((r, c), (r-i, c), self.board))
+        #             if self.board[r-i][c][0] == "b":
+        #                 moves.append(Move((r, c), (r-i, c), self.board))
+        #         if (c+i) <= 7:
+        #             if self.board[r][c+i] == "--":
+        #                 moves.append(Move((r, c), (r, c+i), self.board))
+        #             if self.board[r][c+i][0] == "b":
+        #                 moves.append(Move((r, c), (r, c+i), self.board))
+        #         if (c-i) >= 0:    
+        #             if self.board[r][c-i] == "--":
+        #                 moves.append(Move((r, c), (r, c-i), self.board))
+        #             if self.board[r][c-i][0] == "b":
+        #                 moves.append(Move((r, c), (r, c-i), self.board))
+
+        #         if (r+i) <= 7 and (c+i) <= 7:
+        #             if self.board[r+i][c+i] == "--":
+        #                 moves.append(Move((r, c), (r+i, c+i), self.board))
+        #             if self.board[r+i][c+i][0] == "b":
+        #                 moves.append(Move((r, c), (r+i, c+i), self.board))          
+        #         if (r-i) >= 0 and (c-i) >= 0:
+        #             if self.board[r-i][c-i] == "--":
+        #                 moves.append(Move((r, c), (r-i, c-i), self.board))
+        #             if self.board[r-i][c-i][0] == "b":
+        #                 moves.append(Move((r, c), (r-i, c-i), self.board))
+        #         if (r+i) <= 7 and (c-i) >= 0:
+        #             if self.board[r+i][c-i] == "--":
+        #                 moves.append(Move((r, c), (r+i, c-i), self.board))
+        #             if self.board[r+i][c-i][0] == "b":
+        #                 moves.append(Move((r, c), (r+i, c-i), self.board))          
+        #         if (r-i) >= 0 and (c+i) <= 7:
+        #             if self.board[r-i][c+i] == "--":
+        #                 moves.append(Move((r, c), (r-i, c+i), self.board))
+        #             if self.board[r-i][c+i][0] == "b":
+        #                 moves.append(Move((r, c), (r-i, c+i), self.board))
+
+        #     else: #black queen move
+        #         if (r+i) <= 7:
+        #             if self.board[r+i][c] == "--":
+        #                 moves.append(Move((r, c), (r+i, c), self.board))
+        #             if self.board[r+i][c][0] == "w":
+        #                 moves.append(Move((r, c), (r+i, c), self.board))          
+        #         if (r-i) >= 0:
+        #             if self.board[r-i][c] == "--":
+        #                 moves.append(Move((r, c), (r-i, c), self.board))
+        #             if self.board[r-i][c][0] == "w":
+        #                 moves.append(Move((r, c), (r-i, c), self.board))
+        #         if (c+i) <= 7:
+        #             if self.board[r][c+i] == "--":
+        #                 moves.append(Move((r, c), (r, c+i), self.board))
+        #             if self.board[r][c+i][0] == "w":
+        #                 moves.append(Move((r, c), (r, c+i), self.board))
+        #         if (c-i) >= 0:    
+        #             if self.board[r][c-i] == "--":
+        #                 moves.append(Move((r, c), (r, c-i), self.board))
+        #             if self.board[r][c-i][0] == "w":
+        #                 moves.append(Move((r, c), (r, c-i), self.board))
+                
+        #         if (r+i) <= 7 and (c+i) <= 7:
+        #             if self.board[r+i][c+i] == "--":
+        #                 moves.append(Move((r, c), (r+i, c+i), self.board))
+        #             if self.board[r+i][c+i][0] == "w":
+        #                 moves.append(Move((r, c), (r+i, c+i), self.board))          
+        #         if (r-i) >= 0 and (c-i) >= 0:
+        #             if self.board[r-i][c-i] == "--":
+        #                 moves.append(Move((r, c), (r-i, c-i), self.board))
+        #             if self.board[r-i][c-i][0] == "w":
+        #                 moves.append(Move((r, c), (r-i, c-i), self.board))
+        #         if (r+i) <= 7 and (c-i) >= 0:
+        #             if self.board[r+i][c-i] == "--":
+        #                 moves.append(Move((r, c), (r+i, c-i), self.board))
+        #             if self.board[r+i][c-i][0] == "w":
+        #                 moves.append(Move((r, c), (r+i, c-i), self.board))          
+        #         if (r-i) >= 0 and (c+i) <= 7:
+        #             if self.board[r-i][c+i] == "--":
+        #                 moves.append(Move((r, c), (r-i, c+i), self.board))
+        #             if self.board[r-i][c+i][0] == "w":
+        #                 moves.append(Move((r, c), (r-i, c+i), self.board)) 
+    
+    
+    
+    
+    
     def getKingMoves(self, r, c, moves):
         pass
     
